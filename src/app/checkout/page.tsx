@@ -1,49 +1,59 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import { useCart } from "../../context/CartContext";
-
 import { supabase } from "../../lib/supabase";
 
-export default function CheckoutPage(){
+export default function CheckoutPage() {
 
-const { cart } =
-useCart();
+const { cart } = useCart();
 
-const router =
-useRouter();
+const router = useRouter();
 
-const [name,setName] =
-useState("");
+const [name, setName] = useState("");
+const [email, setEmail] = useState("");
+const [loading, setLoading] = useState(false);
 
-const [email,setEmail] =
-useState("");
+useEffect(() => {
 
-const [loading,setLoading] =
-useState(false);
+checkUser();
 
-const total =
+}, []);
 
-cart.reduce(
+async function checkUser() {
 
-(sum,item)=>
+const {
+data: { session },
+} = await supabase.auth.getSession();
 
-sum+
-item.price,
+if (!session) {
 
-0
+router.push("/userlogin");
 
+return;
+
+}
+
+setEmail(
+session.user.email || ""
 );
 
-async function placeOrder(){
+}
 
-if(
-!name
-||
+const total = cart.reduce(
+(sum, item) =>
+sum + item.price,
+0
+);
+
+async function placeOrder() {
+
+if (
+!name ||
 !email
-){
+) {
 
 alert(
 "Fill all fields"
@@ -53,64 +63,43 @@ return;
 
 }
 
-setLoading(
-true
-);
+setLoading(true);
 
-const {
+const { error } = await supabase
 
-error
-
-}
-
-=
-
-await supabase
-
-.from(
-"orders"
-)
+.from("orders")
 
 .insert([
 
 {
 
-customer_name:
-name,
+customer_name: name,
 
-customer_email:
-email,
+customer_email: email,
 
 total,
 
-items:
-cart,
+items: cart,
 
 },
 
 ]);
 
-setLoading(
-false
-);
+setLoading(false);
 
-if(error){
+if (error) {
 
-alert(
-error.message
-);
+alert(error.message);
 
 return;
 
 }
 
-router.push(
-"/success"
-);
+router.push("/success");
 
 }
 
-return(
+return (
 
 <main
 className="
@@ -150,19 +139,14 @@ space-y-5
 
 <input
 
-placeholder=
-"Full Name"
+placeholder="Full Name"
 
-value=
-{name}
+value={name}
 
-onChange={
-(e)=>
-
+onChange={(e) =>
 setName(
 e.target.value
 )
-
 }
 
 className="
@@ -181,31 +165,22 @@ outline-none
 
 <input
 
-placeholder=
-"Email"
+placeholder="Email"
 
-value=
-{email}
+value={email}
 
-onChange={
-(e)=>
-
-setEmail(
-e.target.value
-)
-
-}
+readOnly
 
 className="
 w-full
-bg-white
+bg-gray-200
 text-black
-placeholder:text-gray-500
 border
 border-gray-300
 p-5
 rounded-2xl
 outline-none
+cursor-not-allowed
 "
 
 />
@@ -237,17 +212,11 @@ Order Summary
 {
 
 cart.map(
-
-(
-item,
-index
-)=>(
+(item, index) => (
 
 <div
 
-key={
-index
-}
+key={index}
 
 className="
 flex
@@ -259,26 +228,19 @@ mb-4
 
 <p>
 
-{
-item.title
-}
+{item.title}
 
 </p>
 
 <p>
 
-$
-
-{
-item.price
-}
+${item.price}
 
 </p>
 
 </div>
 
 )
-
 )
 
 }
@@ -299,23 +261,15 @@ font-bold
 
 Total:
 
-$
-
-{
-total
-}
+${total}
 
 </h2>
 
 <button
 
-onClick={
-placeOrder
-}
+onClick={placeOrder}
 
-disabled={
-loading
-}
+disabled={loading}
 
 className="
 mt-10
@@ -324,15 +278,10 @@ bg-gradient-to-r
 from-[#7A5800]
 via-[#D4AF37]
 to-[#7A5800]
-
 text-black
-
 font-bold
-
 text-xl
-
 py-5
-
 rounded-2xl
 "
 
