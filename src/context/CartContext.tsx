@@ -1,101 +1,90 @@
 "use client";
 
 import {
-createContext,
-useContext,
-useState,
-ReactNode,
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
 } from "react";
 
 type Item = {
-id:number;
-title:string;
-price:number;
+  id: number;
+  title: string;
+  price: number;
 };
 
 type CartType = {
-cart: Item[];
-
-addToCart:(item:Item)=>void;
-
-removeFromCart:
-(id:number)=>void;
+  cart: Item[];
+  addToCart: (item: Item) => void;
+  removeFromCart: (index: number) => void;
 };
 
-const CartContext =
-createContext<CartType | null>(null);
+const CartContext = createContext<CartType | null>(null);
 
 export function CartProvider({
-children,
-}:{
-children:ReactNode;
+  children,
+}: {
+  children: ReactNode;
 }) {
+  const [cart, setCart] = useState<Item[]>([]);
 
-const [cart,setCart] =
-useState<Item[]>([]);
+  useEffect(() => {
+    const savedCart = localStorage.getItem("cart");
 
-function addToCart(item:Item){
+    if (savedCart) {
+      setCart(JSON.parse(savedCart));
+    }
+  }, []);
 
-setCart((prev)=>[
-...prev,
-item,
-]);
+  useEffect(() => {
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(cart)
+    );
+  }, [cart]);
 
-}
-function removeFromCart(
-index:number
-){
+  function addToCart(item: Item) {
+    setCart((prev) => [
+      ...prev,
+      item,
+    ]);
+  }
 
-setCart(
-(prev)=>{
+  function removeFromCart(
+    index: number
+  ) {
+    setCart((prev) => {
+      const copy = [...prev];
 
-const copy=
-[...prev];
+      copy.splice(index, 1);
 
-copy.splice(
-index,
-1
-);
+      return copy;
+    });
+  }
 
-return copy;
-
-}
-
-);
-
-}
-
-return (
-
-<CartContext.Provider
-value={{
-cart,
-addToCart,
-removeFromCart,
-}}
->
-
-{children}
-
-</CartContext.Provider>
-
-);
-
+  return (
+    <CartContext.Provider
+      value={{
+        cart,
+        addToCart,
+        removeFromCart,
+      }}
+    >
+      {children}
+    </CartContext.Provider>
+  );
 }
 
-export function useCart(){
+export function useCart() {
+  const ctx =
+    useContext(CartContext);
 
-const ctx=
-useContext(CartContext);
+  if (!ctx) {
+    throw new Error(
+      "useCart error"
+    );
+  }
 
-if(!ctx){
-
-throw new Error(
-"useCart error"
-);
-
-}
-
-return ctx;
-
+  return ctx;
 }
