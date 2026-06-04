@@ -1,177 +1,164 @@
 "use client";
 
-import {
-useCart
-}
-from
-"../../context/CartContext";
+import { useCart } from "../../context/CartContext";
 import Link from "next/link";
 
-export default function CartPage(){
+export default function CartPage() {
+  const { cart, addToCart, removeFromCart } = useCart();
 
-const {
-cart,
-removeFromCart}=
-useCart();
+  const groupedItems = cart.reduce((acc: any, item) => {
+    if (!acc[item.id]) {
+      acc[item.id] = {
+        ...item,
+        quantity: 1,
+      };
+    } else {
+      acc[item.id].quantity += 1;
+    }
 
-const total=
-cart.reduce(
-(
-sum,
-item
-)=>
+    return acc;
+  }, {});
 
-sum+
-item.price,
+  const products = Object.values(groupedItems) as any[];
 
-0
-);
+  const total = cart.reduce(
+    (sum, item) => sum + item.price,
+    0
+  );
 
-return(
+  return (
+    <main
+      className="
+      max-w-7xl
+      mx-auto
+      px-8
+      py-20
+      "
+    >
+      <h1
+        className="
+        text-6xl
+        font-bold
+        mb-16
+        "
+      >
+        Cart
+      </h1>
 
-<main
-className="
-max-w-7xl
-mx-auto
-px-8
-py-20
-"
->
+      {cart.length === 0 ? (
+        <p>Cart Empty</p>
+      ) : (
+        <>
+          {products.map((item) => (
+            <div
+              key={item.id}
+              className="
+              border
+              p-8
+              rounded-xl
+              mb-6
+              flex
+              justify-between
+              items-center
+              "
+            >
+              <div>
+                <h2 className="text-2xl">
+                  {item.title}
+                </h2>
 
-<h1
-className="
-text-6xl
-font-bold
-mb-16
-"
->
+                <p>
+                  Price: ${item.price}
+                </p>
 
-Cart
+                <p className="font-semibold mt-2">
+                  Total: $
+                  {item.price * item.quantity}
+                </p>
+              </div>
 
-</h1>
+              <div className="flex items-center gap-4">
 
-{
+                <button
+                  onClick={() =>
+                    removeFromCart(
+                      cart.findIndex(
+                        (cartItem) =>
+                          cartItem.id === item.id
+                      )
+                    )
+                  }
+                  className="
+                  bg-red-500
+                  text-white
+                  w-12
+                  h-12
+                  rounded-full
+                  text-2xl
+                  font-bold
+                  "
+                >
+                  -
+                </button>
 
-cart.length===0
+                <span
+                  className="
+                  text-2xl
+                  font-bold
+                  min-w-[40px]
+                  text-center
+                  "
+                >
+                  {item.quantity}
+                </span>
 
-?
+                <button
+                  onClick={() =>
+                    addToCart(item)
+                  }
+                  className="
+                  bg-green-500
+                  text-white
+                  w-12
+                  h-12
+                  rounded-full
+                  text-2xl
+                  font-bold
+                  "
+                >
+                  +
+                </button>
 
-<p>
+              </div>
+            </div>
+          ))}
 
-Cart Empty
+          <h2
+            className="
+            text-4xl
+            font-bold
+            mt-10
+            "
+          >
+            Total: ${total}
+          </h2>
 
-</p>
-
-:
-
-<>
-
-{
-
-cart.map(
-(
-item,
-index
-)=>(
-
-<div
-key={
-`${item.id}-${index}`
-}
-className="
-border
-p-8
-rounded-xl
-mb-6
-flex
-justify-between
-"
->
-
-<div>
-
-<h2
-className="
-text-2xl
-"
->
-
-{
-item.title
-}
-
-</h2>
-
-<p>
-
-$
-{
-item.price
-}
-
-</p>
-
-</div>
-
-<button
-onClick={() =>
-  removeFromCart(index)
-}
-className="
-bg-red-500
-text-white
-px-6
-rounded-xl
-"
->
-Remove
-</button>
-
-</div>
-
-)
-
-)
-
-}
-
-<h2
-className="
-text-4xl
-font-bold
-mt-10
-"
->
-
-Total:
-
-<Link href="/checkout">
-
-<button
-className="
-mt-8
-bg-black
-text-white
-px-8
-py-4
-rounded-xl
-"
->
-
-Proceed To Checkout
-
-</button>
-
-</Link>
-
-</h2>
-
-</>
-
-}
-
-</main>
-
-);
-
+          <Link href="/checkout">
+            <button
+              className="
+              mt-8
+              bg-black
+              text-white
+              px-8
+              py-4
+              rounded-xl
+              "
+            >
+              Proceed To Checkout
+            </button>
+          </Link>
+        </>
+      )}
+    </main>
+  );
 }
