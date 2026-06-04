@@ -58,6 +58,20 @@ export default function LoginPage() {
           Login
         </button>
 
+        <div className="text-center mt-4">
+
+  <a
+    href="/forgot-password"
+    className="
+    text-[#D4AF37]
+    underline
+    "
+  >
+    Forgot Password?
+  </a>
+
+</div>
+
         <div className="mt-6 text-center">
 
 <p className="text-white">
