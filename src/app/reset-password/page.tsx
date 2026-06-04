@@ -31,7 +31,7 @@ export default function ResetPasswordPage() {
       "Password updated successfully"
     );
 
-    router.push("/login");
+    router.push("/userlogin");
   }
 
   return (
