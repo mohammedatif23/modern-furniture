@@ -41,7 +41,7 @@ export default function SignupPage() {
 
     alert("Account created successfully. Please check your email.");
 
-    router.push("/login");
+    router.push("/userlogin");
   }
 
   return (
