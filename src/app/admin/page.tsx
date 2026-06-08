@@ -46,24 +46,25 @@ loadOrders();
 
 },[]);
 
-async function checkUser(){
+async function checkUser() {
+  const { data } =
+    await supabase.auth.getUser();
 
-const {
+  if (!data.user) {
+    router.push("/login");
+    return;
+  }
 
-data
+  if (
+    data.user.email?.toLowerCase() !==
+    "ma2034754@gmail.com"
+  ) {
+    await supabase.auth.signOut();
 
-}
+    router.push("/login");
 
-=
-
-await supabase.auth.getUser();
-
-if(!data.user){
-
-router.push("/login");
-
-}
-
+    return;
+  }
 }
 
 async function loadProducts(){
