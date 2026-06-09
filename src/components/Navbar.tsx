@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { supabase } from "../lib/supabase";
+import Image from "next/image";
 
 export default function Navbar() {
   const { cart } = useCart();
@@ -57,7 +58,15 @@ export default function Navbar() {
         </button>
 
         <Link href="/">
-          <h1
+        
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            width={40}
+            height={40}
+            priority
+          />
+          {/* <h1
             className="
             text-[#D4AF37]
             text-2xl
@@ -66,7 +75,7 @@ export default function Navbar() {
             "
           >
             ModernFurniture
-          </h1>
+          </h1> */}
         </Link>
       </div>
 
