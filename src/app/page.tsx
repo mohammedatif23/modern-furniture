@@ -9,8 +9,8 @@ import Newsletter from "../components/Newsletter";
 export default function Home() {
   return (
     <>
-      {/* <Navbar /> */}
-      <Hero />
+{/*       <Navbar />
+ */}      <Hero />
       <Categories />
       <FeaturedProducts />
       <Testimonials />
