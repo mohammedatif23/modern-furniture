@@ -52,20 +52,32 @@ export default function CheckoutPage() {
       );
 
       const response = await fetch("/api/create-checkout-session", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          cart,
-          customerName: name,
-          customerEmail: email,
-        }),
-      });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    cart,
+    customerName: name,
+    customerEmail: email,
+  }),
+});
 
-      const data = await response.json();
+const data = await response.json();
 
-      window.location.href = data.url;
+console.log("Stripe Response:", data);
+
+if (!response.ok) {
+  alert(data.error || "Stripe error");
+  return;
+}
+
+if (!data.url) {
+  alert("No checkout URL returned");
+  return;
+}
+
+window.location.href = data.url;
     } catch (error) {
       console.error(error);
       alert("Payment failed");
