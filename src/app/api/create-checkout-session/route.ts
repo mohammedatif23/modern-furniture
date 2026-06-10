@@ -32,7 +32,7 @@ export async function POST(req: Request) {
        `${process.env.NEXT_PUBLIC_SITE_URL}`,
 
       cancel_url:
-        "https://your-domain.com/cart",
+      `${process.env.NEXT_PUBLIC_SITE_URL}/cart`,
     });
 
   return NextResponse.json({
