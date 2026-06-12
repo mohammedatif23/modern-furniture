@@ -1,38 +1,20 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "../../lib/supabase";
 
 export default function ShopPage() {
-
-  const searchParams = useSearchParams();
-
   const [products, setProducts] = useState<any[]>([]);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState(
-  searchParams.get("category") || "All"
-);
+  const [category, setCategory] = useState("All");
   const [sort, setSort] = useState("default");
 
   useEffect(() => {
-
-
     loadProducts();
   }, []);
 
-  useEffect(() => {
-  const categoryFromUrl =
-    searchParams.get("category");
-
-  if (categoryFromUrl) {
-    setCategory(categoryFromUrl);
-  }
-}, [searchParams]);
-
   async function loadProducts() {
-
     const { data, error } = await supabase
       .from("products")
       .select("*");
@@ -77,27 +59,26 @@ export default function ShopPage() {
     <main
       className="
       min-h-screen
-      bg-black
-      text-white
+      bg-[#F1E4C8]
+      text-black
       px-6
       md:px-12
       py-12
-    "
+      "
     >
       <div
         className="
         max-w-7xl
         mx-auto
-      "
+        "
       >
         <h1
           className="
           text-5xl
           md:text-7xl
           font-bold
-          text-[#D4AF37]
           mb-10
-        "
+          "
         >
           Shop
         </h1>
@@ -117,7 +98,8 @@ export default function ShopPage() {
           p-5
           mb-8
           outline-none
-        "
+          shadow-md
+          "
         />
 
         <div
@@ -126,7 +108,7 @@ export default function ShopPage() {
           flex-wrap
           gap-4
           mb-10
-        "
+          "
         >
           <select
             value={sort}
@@ -139,7 +121,8 @@ export default function ShopPage() {
             rounded-xl
             px-5
             py-3
-          "
+            shadow-md
+            "
           >
             <option value="default">
               Default
@@ -154,30 +137,34 @@ export default function ShopPage() {
             </option>
           </select>
 
-          {["All", "Sofa", "Bed", "Table", "Chair"].map(
-            (item) => (
-              <button
-                key={item}
-                onClick={() =>
-                  setCategory(item)
-                }
-                className={`
+          {[
+            "All",
+            "Sofa",
+            "Bed",
+            "Table",
+            "Chair",
+          ].map((item) => (
+            <button
+              key={item}
+              onClick={() =>
+                setCategory(item)
+              }
+              className={`
                 px-6
                 py-3
-                rounded-xl
-                border
+                rounded-full
+                shadow-md
 
                 ${
                   category === item
-                    ? "bg-[#D4AF37] text-black border-[#D4AF37]"
-                    : "border-white text-white"
+                    ? "bg-black text-white"
+                    : "bg-white text-black"
                 }
               `}
-              >
-                {item}
-              </button>
-            )
-          )}
+            >
+              {item}
+            </button>
+          ))}
         </div>
 
         <div
@@ -187,20 +174,22 @@ export default function ShopPage() {
           sm:grid-cols-2
           lg:grid-cols-4
           gap-8
-        "
+          "
         >
           {filteredProducts.map((product) => (
             <Link
               key={product.id}
               href={`/shop/${product.id}`}
               className="
-              border
-              border-[#D4AF37]
+              bg-white
               rounded-3xl
               overflow-hidden
-              hover:scale-105
+              shadow-md
+              hover:shadow-xl
+              transition-all
               duration-300
-            "
+              hover:-translate-y-2
+              "
             >
               <img
                 src={product.image}
@@ -209,7 +198,7 @@ export default function ShopPage() {
                 w-full
                 h-64
                 object-cover
-              "
+                "
               />
 
               <div className="p-5">
@@ -218,26 +207,25 @@ export default function ShopPage() {
                   text-xl
                   font-semibold
                   mb-2
-                "
+                  "
                 >
                   {product.title}
                 </h3>
 
                 <p
                   className="
-                  text-[#D4AF37]
                   text-2xl
                   font-bold
-                "
+                  "
                 >
                   ${product.price}
                 </p>
 
                 <p
                   className="
-                  text-gray-400
+                  text-gray-500
                   mt-2
-                "
+                  "
                 >
                   {product.category}
                 </p>

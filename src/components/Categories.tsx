@@ -145,7 +145,7 @@ export default function Categories() {
         (item) => (
           <Link
             key={item}
-            href={`/shop?category=${item}`}
+            href="/shop"
           >
             <div
               className="
