@@ -1,4 +1,4 @@
-export default function Categories(){
+/* export default function Categories(){
 
 const items=[
 "Sofa",
@@ -93,4 +93,81 @@ font-bold
 
 );
 
+} */
+
+
+"use client";
+
+import Link from "next/link";
+
+export default function Categories() {
+  const categories = [
+
+    "Sofa",
+    "Bed",
+    "Chair",
+    "Dining",
+  ];
+
+  return (
+    <section
+  className="
+  py-20
+  bg-[#F1E4C8]
+  "
+>
+  <div
+    className="
+    max-w-7xl
+    mx-auto
+    px-6
+    "
+  >
+    <h2
+      className="
+      text-5xl
+      font-bold
+      mb-10
+      text-black
+      "
+    >
+      Browse Collections
+    </h2>
+
+    <div
+      className="
+      flex
+      flex-wrap
+      gap-5
+      "
+    >
+      {["Sofa", "Bed", "Chair", "Table"].map(
+        (item) => (
+          <Link
+            key={item}
+            href={`/shop?category=${item}`}
+          >
+            <div
+              className="
+              bg-white
+              px-10
+              py-6
+              rounded-full
+              shadow-md
+              hover:shadow-xl
+              transition
+              text-xl
+              text-black
+              font-semibold
+              "
+            >
+              {item}
+            </div>
+          </Link>
+        )
+      )}
+    </div>
+  </div>
+</section>
+  );
 }

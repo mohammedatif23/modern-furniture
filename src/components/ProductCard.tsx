@@ -1,100 +1,130 @@
 import Link from "next/link";
 
 type ProductProps = {
-id:number;
-image:string;
-title:string;
-price:string;
+  id: number;
+  image: string;
+  title: string;
+  price: string;
 };
 
 export default function ProductCard({
-id,
-image,
-title,
-price,
-}:ProductProps){
+  id,
+  image,
+  title,
+  price,
+}: ProductProps) {
+  return (
+    <Link href={`/shop/${id}`}>
+      {/* <div
+        className="
+        bg-white
+        rounded-3xl
+        overflow-hidden
+        shadow-md
+        hover:shadow-2xl
+        transition-all
+        duration-300
+        hover:-translate-y-2
+        cursor-pointer
+        "
+      > */}
+            <div
+        className="
+        bg-white
+        rounded-3xl
+        shadow-md
+        overflow-hidden
+        transition
+        hover:shadow-xl
+        "
+        >
+        <div className="overflow-hidden">
+          {/* <img
+            src={image}
+            alt={title}
+            className="
+            h-[300px]
+            w-full
+            object-cover
+            transition-transform
+            duration-500
+            hover:scale-105
+            "
+          /> */}
+                <img
+        src={image}
+        alt={title}
+        className="
+        h-[300px]
+        w-full
+        object-cover
+        "
+        />
+        </div>
 
-return(
+        {/* <div className="p-6">
 
-<Link href={`/shop/${id}`}>
+          <h3
+            className="
+            text-xl
+            font-semibold
+            text-black
+            "
+          >
+            {title}
+          </h3>
 
-<div
-className="
-group
-cursor-pointer
-"
->
+          <p
+            className="
+            mt-2
+            text-2xl
+            font-bold
+            text-black
+            "
+          >
+            ${price}
+          </p>
 
-<div
-className="
-overflow-hidden
-rounded-3xl
-"
->
+          <button
+            className="
+            mt-5
+            w-full
+            bg-black
+            text-white
+            py-3
+            rounded-full
+            font-medium
+            hover:bg-gray-800
+            transition
+            "
+          >
+            View Product
+          </button>
 
-<img
+        </div> */}
+                <div className="p-6">
+        <h3 className="text-2xl font-semibold text-black">
+            {title}
+        </h3>
 
-src={image}
+        <p className="mt-2 text-gray-600">
+            ${price}
+        </p>
 
-alt={title}
-
-className="
-h-[350px]
-w-full
-object-cover
-
-transition
-
-duration-700
-
-group-hover:scale-110
-
-group-hover:rotate-1
-
-"
-
-/>
-
-</div>
-
-<div
-className="
-mt-5
-"
->
-
-<h3
-className="
-text-2xl
-font-semibold
-
-group-hover:
-underline
-
-"
->
-
-{title}
-
-</h3>
-
-<p
-className="
-mt-2
-text-gray-500
-"
->
-
-${price}
-
-</p>
-
-</div>
-
-</div>
-
-</Link>
-
-);
-
+        <button
+            className="
+            mt-5
+            w-full
+            bg-black
+            text-white
+            py-3
+            rounded-full
+            "
+        >
+            View Product
+        </button>
+        </div>
+      </div>
+    </Link>
+  );
 }

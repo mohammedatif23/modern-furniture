@@ -1,14 +1,13 @@
 export default function Footer() {
   return (
-    <footer className="bg-black text-white py-20">
-
+    <footer className="bg-[#2B2B2B] text-white py-16">
       <div className="max-w-7xl mx-auto px-8">
 
         <div className="grid md:grid-cols-4 gap-10">
 
           <div>
             <h2 className="text-3xl font-bold">
-              UrbanFurniture
+              Modern Furniture
             </h2>
 
             <p className="mt-4 text-gray-400">
@@ -75,7 +74,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-16 border-t border-gray-800 pt-8 text-gray-500">
-          © 2026 UrbanFurniture
+          © 2026 Modern Furniture
         </div>
 
       </div>

@@ -1,19 +1,35 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "../../lib/supabase";
 
 export default function ShopPage() {
 
+  const searchParams = useSearchParams();
+
   const [products, setProducts] = useState<any[]>([]);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("All");
+  const [category, setCategory] = useState(
+  searchParams.get("category") || "All"
+);
   const [sort, setSort] = useState("default");
 
   useEffect(() => {
+
+
     loadProducts();
   }, []);
+
+  useEffect(() => {
+  const categoryFromUrl =
+    searchParams.get("category");
+
+  if (categoryFromUrl) {
+    setCategory(categoryFromUrl);
+  }
+}, [searchParams]);
 
   async function loadProducts() {
 

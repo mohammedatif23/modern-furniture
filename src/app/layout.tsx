@@ -71,7 +71,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-[#DEB887]">
         <CartProvider>
           <Navbar />
           <main className="flex-1">
