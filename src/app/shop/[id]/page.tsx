@@ -236,16 +236,18 @@ product.price
 </h2>
 
 <button
-
-onClick={()=>
-
-addToCart(
-product
-)
-
+  /* onClick={() => {
+    addToCart(product);
+  } */
+ onClick={() =>
+  addToCart({
+    id: product.id,
+    title: product.title,
+    price: product.price,
+    image: product.image,
+  })
 }
-
-className="
+  className="
 w-full
 
 bg-gradient-to-r
@@ -264,28 +266,16 @@ py-5
 
 rounded-2xl
 "
-
 >
-
-Add To Cart
-
+  Add To Cart
 </button>
 
 <button
-
-onClick={()=>{
-
-addToCart(
-product
-);
-
-router.push(
-"/checkout"
-);
-
-}}
-
-className="
+  onClick={() => {
+    addToCart(product);
+    router.push("/checkout");
+  }}
+  className="
 w-full
 
 mt-5
@@ -302,11 +292,8 @@ py-5
 
 rounded-2xl
 "
-
 >
-
-Buy Now
-
+  Buy Now
 </button>
 
 </div>

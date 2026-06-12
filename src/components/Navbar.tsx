@@ -3,12 +3,39 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useCart } from "../context/CartContext";
-import Image from "next/image";
+import Image from "next/image"
+
 
 export default function Navbar() {
-  const { cart } = useCart();
+  const {
+  cart,
+  increaseQuantity,
+  decreaseQuantity,
+} = useCart();
   const [profileOpen, setProfileOpen] =
   useState(false);
+  const [cartOpen, setCartOpen] =
+  useState(false);
+
+  /* const groupedItems = cart.reduce(
+  (acc: any, item: any) => {
+    if (!acc[item.id]) {
+      acc[item.id] = {
+        ...item,
+        quantity: 1,
+      };
+    } else {
+      acc[item.id].quantity += 1;
+    }
+
+    return acc;
+  },
+  {}
+); */
+
+/* const cartProducts = Object.values(
+  groupedItems
+) as any[]; */
 
   return (
     <nav
@@ -91,19 +118,26 @@ export default function Navbar() {
           👤
         </button>
 
-        <Link href="/cart">
-          <button
-            className="
-            bg-black
-            text-white
-            px-6
-            py-3
-            rounded-full
-            "
-          >
-            Cart ({cart.length})
-          </button>
-        </Link>
+                <button
+          onClick={() => setCartOpen(true)}
+          className="
+          bg-black
+          text-white
+          px-6
+          py-3
+          rounded-full
+          "
+        >
+          {/* Cart ({cart.length}) */}Cart (
+{
+  cart.reduce(
+    (sum, item) =>
+      sum + item.quantity,
+    0
+  )
+}
+)
+        </button>
 
       </div>  
       </div>
@@ -245,8 +279,252 @@ profileOpen && (
 
   </div>
 
+  {cartOpen && (
+  <div
+    onClick={() => setCartOpen(false)}
+    className="
+    fixed
+    inset-0
+    bg-black/30
+    z-40
+    "
+  />
+)}
+
 </div>
 
+  {/* Cart Overlay */}
+{cartOpen && (
+  <div
+    onClick={() => setCartOpen(false)}
+    className="
+    fixed
+    inset-0
+    bg-black/30
+    z-40
+    "
+  />
+)}
+
+{/* Cart Drawer */}
+<div
+  className={`
+  fixed
+  top-0
+  right-0
+  h-full
+  w-full
+  md:w-[420px]
+  bg-white
+  shadow-2xl
+  z-50
+  transform
+  transition-transform
+  duration-500
+  ease-in-out
+
+  ${
+    cartOpen
+      ? "translate-x-0"
+      : "translate-x-full"
+  }
+  `}
+>
+  <div className="p-8 h-full flex flex-col">
+
+    <div className="flex justify-between items-center mb-8">
+      <h2
+        className="
+        text-3xl
+        font-bold
+        text-black
+        "
+      >
+        Shopping Cart
+      </h2>
+
+      <button
+        onClick={() => setCartOpen(false)}
+        className="
+        text-3xl
+        text-black
+        "
+      >
+        ×
+      </button>
+
+
+    </div>
+
+    <div className="flex-1 overflow-y-auto">
+
+      {cart.length === 0 ? (
+
+        <p className="text-gray-500">
+          Cart is empty
+        </p>
+
+      ) : (
+
+        cart.map((item: any) => (
+
+  <div
+    key={item.id}
+    className="
+    flex
+    gap-4
+    mb-6
+    border-b
+    pb-4
+    "
+  >
+
+    <img
+      src={item.image}
+      alt={item.title}
+      className="
+      w-24
+      h-24
+      object-cover
+      rounded-xl
+      "
+    />
+
+    <div className="flex-1">
+
+      <h3
+        className="
+        text-black
+        font-semibold
+        "
+      >
+        {item.title}
+      </h3>
+
+      <p className="text-gray-500">
+        ${item.price}
+      </p>
+
+      <div
+        className="
+        flex
+        items-center
+        gap-3
+        mt-3
+        "
+      >
+
+        <button
+          onClick={() =>
+            decreaseQuantity(item.id)
+          }
+          className="
+          w-8
+          h-8
+          rounded-full
+          border
+          border-black
+          text-black
+          "
+        >
+          -
+        </button>
+
+        <span
+          className="
+          text-black
+          font-bold
+          "
+        >
+          {item.quantity}
+        </span>
+
+        <button
+          onClick={() =>
+            increaseQuantity(item.id)
+          }
+          className="
+          w-8
+          h-8
+          rounded-full
+          border
+          border-black
+          text-black
+          "
+        >
+          +
+        </button>
+
+      </div>
+
+      <p
+        className="
+        text-black
+        font-semibold
+        mt-3
+        "
+      >
+        Subtotal: $
+        {item.price * item.quantity}
+      </p>
+
+    </div>
+
+  </div>
+
+))
+
+      )}
+
+    </div>
+
+    <div className="border-t pt-6">
+
+      <h3
+        className="
+        text-2xl
+        font-bold
+        text-black
+        mb-4
+        "
+      >
+        {/* Total: $
+        {cart.reduce(
+          (sum: number, item: any) =>
+            sum + item.price,
+          0
+        )} */}
+
+        Total: $
+{
+  cart.reduce(
+    (sum, item) =>
+      sum +
+      item.price *
+      item.quantity,
+    0
+  )
+}
+      </h3>
+
+      <Link href="/checkout">
+        <button
+          className="
+          w-full
+          bg-black
+          text-white
+          py-4
+          rounded-xl
+          "
+        >
+          Checkout
+        </button>
+      </Link>
+
+    </div>
+
+  </div>
+</div>
 
     </nav>
   );
