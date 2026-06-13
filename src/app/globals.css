@@ -82,3 +82,18 @@ section {
     transform: translateY(0);
   }
 }
+
+@keyframes blogScroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-blog-scroll {
+  width: max-content;
+  animation: blogScroll 30s linear infinite;
+}
