@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { supabase } from "../lib/supabase";
 import { useCart } from "../context/CartContext";
-import Image from "next/image"
-
 
 export default function Navbar() {
   const {
@@ -16,26 +16,54 @@ export default function Navbar() {
   useState(false);
   const [cartOpen, setCartOpen] =
   useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  
 
-  /* const groupedItems = cart.reduce(
-  (acc: any, item: any) => {
-    if (!acc[item.id]) {
-      acc[item.id] = {
-        ...item,
-        quantity: 1,
-      };
-    } else {
-      acc[item.id].quantity += 1;
-    }
+    useEffect(() => {
+  checkUser();
+}, []);
 
-    return acc;
-  },
-  {}
-); */
+async function checkUser() {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
-/* const cartProducts = Object.values(
-  groupedItems
-) as any[]; */
+  if (session) {
+    setUser(session.user);
+  }
+}
+
+async function handleLogin() {
+  setLoading(true);
+
+  const { error } =
+    await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+  setLoading(false);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  setUser(user);
+}
+
+async function logout() {
+  await supabase.auth.signOut();
+  setUser(null);
+  setProfileOpen(false);
+}
 
   return (
     <nav
@@ -184,100 +212,182 @@ profileOpen && (
   `}
 >
 
-  <div className="p-10">
+  <div className="p-10 h-full flex flex-col">
 
-    <button
-      onClick={() =>
-        setProfileOpen(false)
-      }
-      className="
-      text-3xl
-      mb-10
-      text-black
-      "
-    >
-      ×
-    </button>
+  <button
+    onClick={() =>
+      setProfileOpen(false)
+    }
+    className="
+    text-3xl
+    mb-10
+    text-black
+    "
+  >
+    ×
+  </button>
 
-    <h2
-      className="
-      text-3xl
-      font-bold
-      text-black
-      mb-8
-      "
-    >
-      Login
-    </h2>
+  {!user ? (
 
-    <input
-      placeholder="Email Address"
-      className="
-      w-full
-      border
-      border-gray-300
-      rounded-xl
-      p-4
-      mb-4
-      text-black
-      "
-    />
-
-    <input
-      type="password"
-      placeholder="Password"
-      className="
-      w-full
-      border
-      border-gray-300
-      rounded-xl
-      p-4
-      mb-4
-      text-black
-      "
-    />
-
-    <a
-      href="/forgot-password"
-      className="
-      text-black
-      underline
-      text-sm
-      "
-    >
-      Forgot Password?
-    </a>
-
-    <button
-      className="
-      mt-6
-      w-full
-      bg-black
-      text-white
-      py-4
-      rounded-xl
-      "
-    >
-      Login
-    </button>
-
-    <Link href="/signup">
-      <button
+    <>
+      <h2
         className="
-        mt-4
+        text-3xl
+        font-bold
+        text-black
+        mb-8
+        "
+      >
+        Login
+      </h2>
+
+      <input
+        type="email"
+        placeholder="Email Address"
+        value={email}
+        onChange={(e) =>
+          setEmail(e.target.value)
+        }
+        className="
         w-full
         border
-        border-black
+        border-gray-300
+        rounded-xl
+        p-4
+        mb-4
         text-black
+        "
+      />
+
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) =>
+          setPassword(e.target.value)
+        }
+        className="
+        w-full
+        border
+        border-gray-300
+        rounded-xl
+        p-4
+        mb-4
+        text-black
+        "
+      />
+
+      <Link
+        href="/forgot-password"
+        className="
+        text-black
+        underline
+        text-sm
+        "
+      >
+        Forgot Password?
+      </Link>
+
+      <button
+        onClick={handleLogin}
+        disabled={loading}
+        className="
+        mt-6
+        w-full
+        bg-black
+        text-white
         py-4
         rounded-xl
         "
       >
-        Create Account
+        {loading
+          ? "Logging in..."
+          : "Login"}
       </button>
-    </Link>
 
-  </div>
+      <Link href="/signup">
+        <button
+          className="
+          mt-4
+          w-full
+          border
+          border-black
+          text-black
+          py-4
+          rounded-xl
+          "
+        >
+          Create Account
+        </button>
+      </Link>
+    </>
+
+  ) : (
+
+    <>
+      <h2
+        className="
+        text-3xl
+        font-bold
+        text-black
+        mb-8
+        "
+      >
+        Profile
+      </h2>
+
+      <div className="mb-6">
+
+        <p
+          className="
+          text-xl
+          font-semibold
+          text-black
+          "
+        >
+          {user.email?.split("@")[0]}
+        </p>
+
+        <p className="text-gray-500">
+          {user.email}
+        </p>
+
+      </div>
+
+      <Link href="/orders">
+        <button
+          className="
+          w-full
+          border
+          border-black
+          py-4
+          rounded-xl
+          text-black
+          "
+        >
+          My Orders
+        </button>
+      </Link>
+
+      <div className="flex-1" />
+
+      <button
+        onClick={logout}
+        className="
+        w-full
+        bg-red-600
+        text-white
+        py-4
+        rounded-xl
+        "
+      >
+        Logout
+      </button>
+    </>
+
+  )}
+
+</div>
 
   {cartOpen && (
   <div
