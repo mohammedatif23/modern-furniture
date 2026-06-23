@@ -31,6 +31,8 @@ export default function CheckoutPage() {
     setEmail(session.user.email || "");
   }
 
+  
+
   const total = cart.reduce((sum, item) => sum + item.price, 0);
 
   async function handlePayment() {
@@ -85,6 +87,7 @@ window.location.href = data.url;
       setLoading(false);
     }
   }
+
 
   return (
     <main className="max-w-6xl mx-auto px-8 py-20 text-white">

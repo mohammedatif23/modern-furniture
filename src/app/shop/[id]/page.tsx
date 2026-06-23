@@ -31,11 +31,20 @@ addToCart
 =
 useCart();
 
+const [reserveFee, setReserveFee] =
+  useState<number>(20);
+
+const [reserving, setReserving] =
+  useState(false);
+
 const [product,setProduct]=
 useState<any>(null);
 
 const [related,setRelated]=
 useState<any[]>([]);
+
+const [showReserve, setShowReserve] =
+  useState(false);
 
 useEffect(()=>{
 
@@ -45,22 +54,14 @@ loadProduct();
 
 async function loadProduct(){
 
-const { data }=
 
-await supabase
 
-.from(
-"products"
-)
-
-.select("*")
-
-.eq(
-"id",
-params.id
-)
-
-.single();
+const { data } = await supabase
+  .from("products")
+  .select("*")
+  .eq("id", params.id)
+  .single();
+  
 
 setProduct(
 data
@@ -87,27 +88,17 @@ id:number
 
 const { data }=
 
-await supabase
+ await supabase
 
-.from(
-"products"
-)
+.from("products")
 
 .select("*")
 
-.eq(
-"category",
-category
-)
+.eq("category",category)
 
-.neq(
-"id",
-id
-)
+.neq("id",id)
 
-.limit(
-4
-);
+.limit(4); 
 
 if(data){
 
@@ -119,29 +110,49 @@ data
 
 }
 
-if(!product){
+async function reserveItem(
+  weeks: number,
+  fee: number
+) {
 
-return(
+  const reserveUntil = new Date();
 
-<div
-className="
-min-h-screen
-bg-black
-text-[#D4AF37]
-flex
-items-center
-justify-center
-text-3xl
-"
->
+  reserveUntil.setDate(
+    reserveUntil.getDate() +
+    weeks * 7
+  );
 
-Loading...
+  const { error } = await supabase
+    .from("products")
+    .update({
+      is_reserved: true,
+      reserved_until: reserveUntil.toISOString(),
+      reservation_fee: fee,
+    })
+    .eq("id", product.id);
 
-</div>
+  if (error) {
+    alert(error.message);
+    return;
+  }
 
-);
-
+  await loadProduct();
+  alert("Item reserved successfully");
 }
+
+    if (!product) {
+
+    return(
+
+    <div>
+    Loading...
+    </div>
+
+    );
+
+    }
+
+
 
 return(
 
@@ -235,11 +246,37 @@ product.price
 
 </h2>
 
+{
+product.is_reserved && (
+
+<div
+className="
+mb-6
+bg-yellow-500
+text-black
+font-bold
+px-5
+py-3
+rounded-xl
+inline-block
+"
+>
+
+Reserved Until {" "}
+{
+new Date(
+product.reserved_until
+).toLocaleDateString()
+}
+
+</div>
+
+)
+}
+
 <button
-  /* onClick={() => {
-    addToCart(product);
-  } */
- onClick={() =>
+disabled={product.is_reserved}
+onClick={() =>
   addToCart({
     id: product.id,
     title: product.title,
@@ -247,53 +284,129 @@ product.price
     image: product.image,
   })
 }
-  className="
+className={`
 w-full
-
-bg-gradient-to-r
-
-from-[#7A5800]
-
-via-[#D4AF37]
-
-to-[#7A5800]
-
-text-black
-
 font-bold
-
 py-5
-
 rounded-2xl
-"
+
+${
+product.is_reserved
+? "bg-gray-700 text-gray-400 cursor-not-allowed"
+: "bg-gradient-to-r from-[#7A5800] via-[#D4AF37] to-[#7A5800] text-black"
+}
+`}
 >
-  Add To Cart
+{
+product.is_reserved
+? "Reserved"
+: "Add To Cart"
+}
 </button>
 
 <button
-  onClick={() => {
-    addToCart(product);
-    router.push("/checkout");
-  }}
+  onClick={() =>
+    setShowReserve(!showReserve)
+  }
   className="
-w-full
-
-mt-5
-
-border
-
-border-[#D4AF37]
-
-text-[#D4AF37]
-
-font-bold
-
-py-5
-
-rounded-2xl
-"
+  w-full
+  mt-5
+  border
+  border-white
+  text-white
+  py-5
+  rounded-2xl
+  "
 >
-  Buy Now
+  Reserve Item
+</button>
+
+{showReserve && (
+
+<div
+  className="
+  mt-5
+  border
+  border-gray-600
+  rounded-2xl
+  p-6
+  space-y-4
+  "
+>
+
+  
+
+  <button
+  onClick={() =>
+    reserveItem(1, 20)
+  }
+  className="
+  w-full
+  bg-neutral-900
+  py-4
+  rounded-xl
+  "
+>
+  0–1 Week ($20)
+</button>
+
+<button
+  onClick={() =>
+    reserveItem(2, 50)
+  }
+  className="
+  w-full
+  bg-neutral-900
+  py-4
+  rounded-xl
+  "
+>
+  1–2 Weeks ($50)
+</button>
+
+<button
+  onClick={() =>
+    reserveItem(4, 100)
+  }
+  className="
+  w-full
+  bg-neutral-900
+  py-4
+  rounded-xl
+  "
+>
+  2–4 Weeks ($100)
+</button>
+
+</div>
+
+)}
+
+<button
+disabled={product.is_reserved}
+onClick={() => {
+addToCart(product);
+router.push("/checkout");
+}}
+className={`
+w-full
+mt-5
+font-bold
+py-5
+rounded-2xl
+
+${
+product.is_reserved
+? "bg-gray-700 text-gray-400 cursor-not-allowed"
+: "border border-[#D4AF37] text-[#D4AF37]"
+}
+`}
+>
+{
+product.is_reserved
+? "Reserved"
+: "Buy Now"
+}
 </button>
 
 </div>
@@ -437,3 +550,8 @@ View
 );
 
 }
+
+/* function eq(arg0: string, id: any) {
+  throw new Error("Function not implemented.");
+}
+ */

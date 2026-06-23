@@ -10,6 +10,8 @@ export default function ShopPage() {
   const [category, setCategory] = useState("All");
   const [sort, setSort] = useState("default");
 
+
+
   useEffect(() => {
     loadProducts();
   }, []);
@@ -17,7 +19,8 @@ export default function ShopPage() {
   async function loadProducts() {
     const { data, error } = await supabase
       .from("products")
-      .select("*");
+      .select("*")
+      .eq("is_sold", false);  
 
     if (!error && data) {
       setProducts(data);

@@ -30,6 +30,7 @@ type CartType = {
   removeFromCart: (
     id: number
   ) => void;
+  clearCart: () => void;
 };
 
 const CartContext =
@@ -38,6 +39,7 @@ const CartContext =
   );
 
 export function CartProvider({
+
   children,
 }: {
   children: ReactNode;
@@ -111,6 +113,11 @@ export function CartProvider({
     );
   }
 
+  function clearCart() {
+  setCart([]);
+  localStorage.removeItem("cart");
+}
+
   function decreaseQuantity(
     id: number
   ) {
@@ -150,6 +157,7 @@ export function CartProvider({
         increaseQuantity,
         decreaseQuantity,
         removeFromCart,
+        clearCart,
       }}
     >
       {children}
