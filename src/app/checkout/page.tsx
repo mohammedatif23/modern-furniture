@@ -46,6 +46,29 @@ export default function CheckoutPage() {
       return;
     }
 
+    for (const item of cart) {
+
+  const { data } = await supabase
+    .from("products")
+    .select("is_reserved,title,reserved_by")
+    .eq("id", item.id)
+    .single();
+
+  const {
+  data: { user },
+} = await supabase.auth.getUser();
+
+if (
+  data?.is_reserved &&
+  data?.reserved_by !== user?.id
+) {
+  alert(
+    `${data.title} is reserved by another customer`
+  );
+  return;
+}
+}
+
     setLoading(true);
 
     try {

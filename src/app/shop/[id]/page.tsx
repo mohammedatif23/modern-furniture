@@ -41,12 +41,25 @@ const [product,setProduct]=
 useState<any>(null);
 
 const [related,setRelated]=
-useState<any[]>([]);
+useState<any[]>([]);  
+
+const [currentUserId, setCurrentUserId] =
+  useState<string | null>(null);
 
 const [showReserve, setShowReserve] =
   useState(false);
 
 useEffect(()=>{
+
+  async function loadCurrentUser() {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  setCurrentUserId(user?.id || null);
+}
+
+loadCurrentUser();
 
 loadProduct();
 
@@ -56,11 +69,14 @@ async function loadProduct(){
 
 
 
-const { data } = await supabase
+const { data, error } = await supabase
   .from("products")
   .select("*")
-  .eq("id", params.id)
+  .eq("id", Number(params.id))
   .single();
+
+console.log("PRODUCT DATA:", data);
+console.log("PRODUCT ERROR:", error);
   
 
 setProduct(
@@ -114,6 +130,17 @@ async function reserveItem(
   weeks: number,
   fee: number
 ) {
+  console.log(
+    "RESERVE CLICKED",
+    weeks,
+    fee
+  );
+
+  const {
+  data: { user },
+} = await supabase.auth.getUser();
+
+
 
   const reserveUntil = new Date();
 
@@ -122,35 +149,61 @@ async function reserveItem(
     weeks * 7
   );
 
-  const { error } = await supabase
-    .from("products")
-    .update({
-      is_reserved: true,
-      reserved_until: reserveUntil.toISOString(),
-      reservation_fee: fee,
-    })
-    .eq("id", product.id);
+  console.log("PRODUCT ID:", product.id);
 
-  if (error) {
-    alert(error.message);
+    console.log("PRODUCT ID:", product.id);
+    console.log("PRODUCT:", product);
+
+    const result = await supabase
+  .from("products")
+  .update({
+    is_reserved: true,
+    reserved_until: reserveUntil.toISOString(),
+    reservation_fee: fee,
+    reserved_by: user?.id,
+  })
+  .eq("id", product.id)
+  .select();
+
+console.log(result);
+
+  console.log(
+    "UPDATE RESULT:",
+    result
+  );
+
+  if (result.error) {
+    alert(result.error.message);
     return;
   }
 
+  alert(
+    "Item reserved successfully"
+  );
+
   await loadProduct();
-  alert("Item reserved successfully");
 }
 
-    if (!product) {
-
-    return(
-
-    <div>
-    Loading...
+if (!product) {
+  return (
+    <div
+      className="
+      min-h-screen
+      flex
+      items-center
+      justify-center
+      text-white
+      text-3xl
+      "
+    >
+      Loading Product...
     </div>
+  );
+}
 
-    );
-
-    }
+const isReservedByAnotherUser =
+  product?.is_reserved &&
+  product?.reserved_by !== currentUserId;
 
 
 
@@ -275,7 +328,10 @@ product.reserved_until
 }
 
 <button
-disabled={product.is_reserved}
+disabled={
+  product.is_reserved &&
+  product.reserved_by !== currentUserId
+}
 onClick={() =>
   addToCart({
     id: product.id,
@@ -291,16 +347,16 @@ py-5
 rounded-2xl
 
 ${
-product.is_reserved
+isReservedByAnotherUser
 ? "bg-gray-700 text-gray-400 cursor-not-allowed"
 : "bg-gradient-to-r from-[#7A5800] via-[#D4AF37] to-[#7A5800] text-black"
 }
-`}
+`} 
 >
 {
-product.is_reserved
+isReservedByAnotherUser
 ? "Reserved"
-: "Add To Cart"
+: "Add to Cart"
 }
 </button>
 
@@ -383,7 +439,7 @@ product.is_reserved
 )}
 
 <button
-disabled={product.is_reserved}
+disabled={isReservedByAnotherUser}
 onClick={() => {
 addToCart(product);
 router.push("/checkout");
@@ -396,14 +452,14 @@ py-5
 rounded-2xl
 
 ${
-product.is_reserved
+isReservedByAnotherUser
 ? "bg-gray-700 text-gray-400 cursor-not-allowed"
 : "border border-[#D4AF37] text-[#D4AF37]"
 }
 `}
 >
 {
-product.is_reserved
+isReservedByAnotherUser
 ? "Reserved"
 : "Buy Now"
 }
@@ -550,8 +606,3 @@ View
 );
 
 }
-
-/* function eq(arg0: string, id: any) {
-  throw new Error("Function not implemented.");
-}
- */
